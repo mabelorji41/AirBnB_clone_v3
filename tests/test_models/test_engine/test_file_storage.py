@@ -30,6 +30,23 @@ class TestFileStorageDocs(unittest.TestCase):
         """Set up for the doc tests"""
         cls.fs_f = inspect.getmembers(FileStorage, inspect.isfunction)
 
+    def test_get_method(self):
+        """Test the get() method of FileStorage"""
+        state = State(name="California")
+        state.save()
+        obj = storage.get(State, state.id)
+        self.assertEqual(obj.id, state.id)
+        self.assertEqual(obj.name, state.name)
+
+    def test_count_method(self):
+        """Test the count() method of FileStorage"""
+        self.assertEqual(storage.count(), 1)
+        self.assertEqual(storage.count(State), 1)
+        City(name="San Francisco").save()
+        self.assertEqual(storage.count(), 2)
+        self.assertEqual(storage.count(State), 1)
+        self.assertEqual(storage.count(City), 1)
+
     def test_pep8_conformance_file_storage(self):
         """Test that models/engine/file_storage.py conforms to PEP8."""
         pep8s = pep8.StyleGuide(quiet=True)
@@ -113,27 +130,3 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
-
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_get(self):
-        """Test that retrieve objects from file.json"""
-        state = State(name='Nairobi')
-        models.storage.new(state)
-        models.storage.save()
-
-        state_obj = models.storage.get(State, state.id)
-
-        self.assertEqual(state, state_obj)
-
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_count(self):
-        """Test that counts objects from file.json"""
-        objs_from_all = len(models.storage.all())
-        objs_from_count = models.storage.count()
-
-        self.assertEqual(objs_from_all, objs_from_count)
-
-        states_from_all = len(models.storage.all(State))
-        states_from_count = models.storage.count(State)
-
-        self.assertEqual(states_from_all, states_from_count)
