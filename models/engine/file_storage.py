@@ -24,6 +24,34 @@ class FileStorage:
     # dictionary - empty but will store all objects by <class name>.id
     __objects = {}
 
+    def get(self, cls, id):
+        """
+        Retrieves one object based on the class and its ID.
+        Args:
+            cls (class): The class of the object to retrieve.
+        id (str):
+            The ID of the object to retrieve.
+    
+        Returns:
+            The object based on the class and its ID, or None if not found.
+        """
+        all_objects = self.all(cls)
+        for obj in all_objects.values():
+            if obj.id == id:
+                return obj
+        return None
+
+    def count(self, cls=None):
+        """
+        Counts the number of objects in storage.
+        Args:
+            cls (class, optional): The class of the objects to count. If not provided, counts all object
+        Returns:
+            The number of objects in storage matching the given class. If no class is passed, returns the count of all objects in storage.
+        """
+        all_objects = self.all(cls)
+        return len(all_objects)
+
     def all(self, cls=None):
         """returns the dictionary __objects"""
         if cls is not None:
@@ -55,7 +83,7 @@ class FileStorage:
                 jo = json.load(f)
             for key in jo:
                 self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
-        except Exception:
+        except:
             pass
 
     def delete(self, obj=None):
@@ -68,29 +96,3 @@ class FileStorage:
     def close(self):
         """call reload() method for deserializing the JSON file to objects"""
         self.reload()
-
-    def get(self, cls, id):
-        """
-        Retrieves object of a class or all objects of that class
-        """
-        if id and isinstance(id, str):
-            if cls and (cls in classes.keys() or cls in classes.values()):
-                all_objs = self.all(cls)
-                for key, value in all_objs.items():
-                    if id == value.id and key.split('.')[1] == id:
-                        return value
-        return
-
-    def count(self, cls=None):
-        """
-        Returns the occurrence of a class or all classes
-        """
-        occurrence = 0
-        if cls:
-            if cls in classes.keys() or cls in classes.values():
-                occurrence = len(self.all(cls))
-            else:
-                return occurrence
-        if not cls:
-            occurrence = len(self.all())
-        return occurrence
