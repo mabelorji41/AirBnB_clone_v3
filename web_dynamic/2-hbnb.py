@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+!/usr/bin/python3
 """ Starts a Flash Web Application """
 from models import storage
 from models.state import State
@@ -19,7 +19,7 @@ def close_db(error):
     storage.close()
 
 
-@app.route('/0-hbnb', strict_slashes=False)
+@app.route('/2-hbnb', strict_slashes=False)
 def hbnb():
     """ HBNB is alive! """
     states = storage.all(State).values()
@@ -37,12 +37,11 @@ def hbnb():
 
     cache_id = str(uuid.uuid4())
 
-    return render_template('0-hbnb.html',
+ return render_template('2-hbnb.html',
                            cache_id=cache_id,
                            states=st_ct,
                            amenities=amenities,
                            places=places)
-
 
 if __name__ == "__main__":
     """ Main Function """
